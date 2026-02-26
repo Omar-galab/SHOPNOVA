@@ -6,16 +6,22 @@ import {
   updateCategory,
   deleteCategory,
 } from "../services/catigory.service.js";
+import {
+  getCategoryValidator,
+  createCategoryValidator,
+  updateCategoryValidator,
+  deleteCategoryValidator,
+} from "../utils/validator/catigory.validator.js";
 
 const router = express.Router();
 
 router.get("/catigories", getCategories);
 
-router.get("/catigories/:id", getCategory);
+router.get("/catigories/:id", getCategoryValidator, getCategory);
 
-router.post("/catigories", creatCategory);
+router.post("/catigories", createCategoryValidator, creatCategory);
 
-router.put("/catigories/:id", updateCategory);
-router.delete("/catigories/:id", deleteCategory);
+router.put("/catigories/:id", updateCategoryValidator, updateCategory);
+router.delete("/catigories/:id", deleteCategoryValidator, deleteCategory);
 
 export default router;
