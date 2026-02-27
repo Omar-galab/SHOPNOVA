@@ -6,6 +6,7 @@ import categoryRoute from "./routes/category.route.js";
 import subCategoryRoute from "./routes/subCategory.route.js";
 import ApiError from "./utils/apiError.js";
 import globalErrorHandler from "./middleware/error.middleware.js";
+import brandRoute from "./routes/brand.route.js";
 
 dotenv.config({
   path: "./config.env",
@@ -26,6 +27,7 @@ if (process.env.NODE_ENV === "development") {
 
 app.use("/api/v1/categories", categoryRoute);
 app.use("/api/v1/subcategories", subCategoryRoute);
+app.use("/api/v1/brands", brandRoute);
 
 app.use((req, res, next) => {
   //const err = new Error(`Can't find ${req.originalUrl} on this server!`);
