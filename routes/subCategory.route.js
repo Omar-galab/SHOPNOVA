@@ -1,0 +1,31 @@
+import express from "express";
+import {
+  getSubCategories,
+  createSubCategory,
+  getSubCategory,
+  updateSubCategory,
+  deleteSubCategory,
+} from "../services/subCategory.service.js";
+import {
+  createSubCategoryValidator,
+  getSubCategoryValidator,
+  updateSubCategoryValidator,
+  deleteSubCategoryValidator,
+} from "../utils/validator/subCategory.validator.js";
+
+// This allows the router to access :categoryId
+// from the parent router (category route)
+const router = express.Router({ mergeParams: true });
+
+router
+  .route("/")
+  .get(getSubCategories)
+  .post(createSubCategoryValidator, createSubCategory);
+
+router
+  .route("/:id")
+  .get(getSubCategoryValidator, getSubCategory)
+  .put(updateSubCategoryValidator, updateSubCategory)
+  .delete(deleteSubCategoryValidator, deleteSubCategory);
+
+export default router;
