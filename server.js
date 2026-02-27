@@ -2,9 +2,10 @@ import express from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import dbConnection from "./config/database.js";
-import catigoryRoute from "./routes/catigory.route.js";
+import categoryRoute from "./routes/category.route.js";
+import subCategoryRoute from "./routes/subCategory.route.js";
 import ApiError from "./utils/apiError.js";
-import globalErrorHandler from "./middleware/erorr.middleware.js";
+import globalErrorHandler from "./middleware/error.middleware.js";
 
 dotenv.config({
   path: "./config.env",
@@ -23,7 +24,8 @@ if (process.env.NODE_ENV === "development") {
 
 // Routes
 
-app.use("/api/v1", catigoryRoute);
+app.use("/api/v1/categories", categoryRoute);
+app.use("/api/v1/subcategories", subCategoryRoute);
 
 app.use((req, res, next) => {
   //const err = new Error(`Can't find ${req.originalUrl} on this server!`);

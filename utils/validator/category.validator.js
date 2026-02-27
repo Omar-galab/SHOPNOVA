@@ -1,5 +1,5 @@
 import { param, check } from "express-validator";
-import validatorMiddleware from "../../middleware/validator.midleware.js";
+import validatorMiddleware from "../../middleware/validator.middleware.js";
 
 export const getCategoryValidator = [
   param("id").isMongoId().withMessage("Invalid category ID"),
