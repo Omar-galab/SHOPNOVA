@@ -38,7 +38,7 @@ const productSchema = new mongoose.Schema(
       required: [true, "Product price is required"],
       trim: true,
       min: [0, "Product price must be greater than or equal to 0"],
-      maxLength: [20, "Product price must be less than 20characters long"],
+      max: [100000, "Product price must be less than 100000"],
     },
     priceAfterDiscount: {
       type: Number,
@@ -46,10 +46,7 @@ const productSchema = new mongoose.Schema(
         0,
         "Product price after discount must be greater than or equal to 0",
       ],
-      maxLength: [
-        20,
-        "Product price after discount must be less than 20 characters long",
-      ],
+      max: [100000, "Product price after discount must be less than 100000"],
     },
     colors: [String],
     imageCover: {
@@ -63,7 +60,7 @@ const productSchema = new mongoose.Schema(
       ref: "category",
       required: [true, "Product category is required"],
     },
-    slubCategory: [
+    subCategory: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "SubCategory",
