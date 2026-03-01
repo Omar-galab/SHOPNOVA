@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Routes
-
+app.set("query parser", "extended");
 app.use("/api/v1/categories", categoryRoute);
 app.use("/api/v1/subcategories", subCategoryRoute);
 app.use("/api/v1/brands", brandRoute);

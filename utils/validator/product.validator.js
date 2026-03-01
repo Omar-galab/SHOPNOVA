@@ -1,5 +1,9 @@
-import { param, check } from "express-validator";
+import { param, check, body } from "express-validator";
+import mongoose from "mongoose";
+import slugify from "slugify";
 import validatorMiddleware from "../../middleware/validator.middleware.js";
+import categoryModel from "../../models/category.model.js";
+import subCategoryModel from "../../models/subCategory.model.js";
 
 export const getProductValidator = [
   param("id").isMongoId().withMessage("Invalid product ID"),
@@ -7,6 +11,11 @@ export const getProductValidator = [
 ];
 export const updateProductValidator = [
   param("id").isMongoId().withMessage("Invalid product ID"),
+  body("title").custom((value, { req }) => {
+    if (req.body.title) {
+      req.body.slug = slugify(req.body.title);
+    }
+  }),
   validatorMiddleware,
 ];
 export const deleteProductValidator = [
@@ -75,18 +84,52 @@ export const createProductValidator = [
     .notEmpty()
     .withMessage("Product category is required")
     .isMongoId()
-    .withMessage("Invalid category ID"),
+    .withMessage("Invalid category ID")
+    .custom(async (categoryID) => {
+      const category = await categoryModel.findById(categoryID);
+      if (!category) {
+        throw new Error("Category not found");
+      }
+    }),
   // Brand
-  check("brand")
-    .notEmpty()
-    .withMessage("Product brand is required")
-    .isMongoId()
-    .withMessage("Invalid brand ID"),
+  check("brand").optional().isMongoId().withMessage("Invalid brand ID"),
   // SubCategory
-  check("slubCategory")
+  check("subCategory")
     .optional()
-    .isMongoId()
-    .withMessage("Invalid subcategory ID"),
+    .isArray()
+    .withMessage("subCategory must be an array")
+    // Check 1: All IDs are valid MongoDB format
+    .custom((subCategoryIDs) => {
+      const isValid = subCategoryIDs.every((id) =>
+        mongoose.isValidObjectId(id),
+      );
+      if (!isValid) {
+        throw new Error("Invalid subCategory ID format");
+      }
+      return true;
+    })
+    // Check 2: All subCategories exist in DB
+    .custom(async (subCategoryIDs, { req }) => {
+      const subCategories = await subCategoryModel.find({
+        _id: { $in: subCategoryIDs },
+      });
+      if (
+        !subCategories.length ||
+        subCategories.length !== subCategoryIDs.length
+      ) {
+        throw new Error("Some subCategories not found");
+      }
+      // Check: Do they belong to category?
+      const notBelongToCategory = subCategories.filter(
+        (sub) => sub.category.toString() !== req.body.category,
+      );
+      if (notBelongToCategory.length > 0) {
+        throw new Error(
+          "Some subCategories do not belong to the specified category",
+        );
+      }
+    }),
+
   // Ratings Average
   check("ratingsAverage")
     .optional()
@@ -97,5 +140,9 @@ export const createProductValidator = [
     .optional()
     .isNumeric()
     .withMessage("Ratings quantity must be a number"),
+  body("title").custom((value, { req }) => {
+    req.body.slug = slugify(value);
+    return true;
+  }),
   validatorMiddleware,
 ];

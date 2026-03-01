@@ -1,17 +1,24 @@
-import slugify from "slugify";
 import asyncHandler from "express-async-handler";
 import categoryModel from "../models/category.model.js";
 import ApiError from "../utils/apiError.js";
+import ApiFeatures from "../utils/apiFeatures.js";
+import { deleteOne, updateOne, createOne } from "./handlersFactory.js";
 
 export const getCategories = asyncHandler(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 5;
-  const skip = (page - 1) * limit;
+  const countDocuments = await categoryModel.countDocuments();
 
-  const categories = await categoryModel.find({}).skip(skip).limit(limit);
+  const apiFeatures = new ApiFeatures(categoryModel.find(), req.query)
+    .paginate(countDocuments)
+    .sort()
+    .limitFields()
+    .search()
+    .filter();
+
+  const { paginationResult, mongooseQuery } = apiFeatures;
+  const categories = await mongooseQuery;
   res
     .status(200)
-    .json({ results: categories.length, page, skip, data: categories });
+    .json({ paginationResult, results: categories.length, data: categories });
 });
 
 export const getCategory = asyncHandler(async (req, res, next) => {
@@ -23,34 +30,8 @@ export const getCategory = asyncHandler(async (req, res, next) => {
   res.status(200).json(category);
 });
 
-export const createCategory = asyncHandler(async (req, res) => {
-  const { name } = req.body;
-  const category = await categoryModel.create({
-    name,
-    slug: slugify(name),
-  });
-  res.status(201).json(category);
-});
+export const createCategory = createOne(categoryModel);
 
-export const updateCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  const category = await categoryModel.findByIdAndUpdate(
-    id,
-    { name, slug: slugify(name) },
-    { new: true },
-  );
-  if (!category) {
-    return next(new ApiError("category not found", 404));
-  }
-  res.status(200).json(category);
-});
+export const updateCategory = updateOne(categoryModel, "Category");
 
-export const deleteCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const category = await categoryModel.findByIdAndDelete(id);
-  if (!category) {
-    return next(new ApiError("category not found", 404));
-  }
-  res.status(204).json(category);
-});
+export const deleteCategory = deleteOne(categoryModel, "Category");

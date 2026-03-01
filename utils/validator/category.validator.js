@@ -1,4 +1,5 @@
-import { param, check } from "express-validator";
+import { param, check, body } from "express-validator";
+import slugify from "slugify";
 import validatorMiddleware from "../../middleware/validator.middleware.js";
 
 export const getCategoryValidator = [
@@ -14,6 +15,10 @@ export const createCategoryValidator = [
     .withMessage("Category name must be at least 3 characters long")
     .isLength({ max: 50 })
     .withMessage("Category name must be less than 50 characters long"),
+  body("name").custom((value, { req }) => {
+    req.body.slug = slugify(value);
+    return true;
+  }),
   validatorMiddleware,
 ];
 export const updateCategoryValidator = [
@@ -26,6 +31,10 @@ export const updateCategoryValidator = [
     .withMessage("Category name must be at least 3 characters long")
     .isLength({ max: 50 })
     .withMessage("Category name must be less than 50 characters long"),
+  body("name").custom((value, { req }) => {
+    req.body.slug = slugify(value);
+    return true;
+  }),
   validatorMiddleware,
 ];
 

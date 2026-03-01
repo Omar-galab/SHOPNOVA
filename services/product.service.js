@@ -1,29 +1,30 @@
 import slugify from "slugify";
 import asyncHandler from "express-async-handler";
+import { json } from "express";
 import productModel from "../models/product.model.js";
 import ApiError from "../utils/apiError.js";
+import ApiFeatures from "../utils/apiFeatures.js";
+import { deleteOne, updateOne, createOne } from "./handlersFactory.js";
 
-export const createProduct = asyncHandler(async (req, res) => {
-  req.body.slug = slugify(req.body.title);
-  const product = await productModel.create(req.body);
-  res.status(201).json({ data: product });
-});
+export const createProduct = createOne(productModel);
 
 // @desc    Get list of products
 // @route   GET /api/v1/products
 // @access  Public
 export const getProducts = asyncHandler(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 5;
-  const skip = (page - 1) * limit;
-  const products = await productModel
-    .find({})
-    .skip(skip)
-    .limit(limit)
-    .populate({ path: "category", select: "name" });
+  const countDocuments = await productModel.countDocuments();
+  const apiFeatures = new ApiFeatures(productModel.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .search("Product")
+    .paginate(countDocuments);
+  const { paginationResult, mongooseQuery } = apiFeatures;
+  const products = await mongooseQuery;
+
   res
     .status(200)
-    .json({ results: products.length, page, skip, data: products });
+    .json({ paginationResult, results: products.length, data: products });
 });
 
 // @desc    Get single product
@@ -43,28 +44,8 @@ export const getProduct = asyncHandler(async (req, res, next) => {
 // @desc    Update product
 // @route   PUT /api/v1/products/:id
 // @access  Private
-export const updateProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  if (req.body.title) {
-    req.body.slug = slugify(req.body.title);
-  }
-
-  const product = await productModel.findByIdAndUpdate(id, req.body, {
-    new: true,
-  });
-  if (!product) {
-    return next(new ApiError("Product not found", 404));
-  }
-  res.status(200).json(product);
-});
+export const updateProduct = updateOne(productModel, "Product");
 // @desc    Delete product
 // @route   DELETE /api/v1/products/:id
 // @access  Private
-export const deleteProduct = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const product = await productModel.findByIdAndDelete(id);
-  if (!product) {
-    return next(new ApiError("Product not found", 404));
-  }
-  res.status(204).json(product);
-});
+export const deleteProduct = deleteOne(productModel, "Product");
