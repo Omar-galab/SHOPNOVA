@@ -20,15 +20,9 @@ export const createFilterObject = (req, res, next) => {
 };
 export const createSubCategory = createOne(subCategoryModel);
 
-export const getSubCategories = getAll(subCategoryModel, {
-  path: "category",
-  select: "name",
-});
+export const getSubCategories = getAll(subCategoryModel);
 
-export const getSubCategory = getOne(subCategoryModel, "SubCategory", {
-  path: "category",
-  select: "name",
-});
+export const getSubCategory = getOne(subCategoryModel, "SubCategory");
 
 export const updateSubCategory = updateOne(subCategoryModel, "SubCategory");
 

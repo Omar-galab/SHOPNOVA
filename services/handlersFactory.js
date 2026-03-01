@@ -30,21 +30,18 @@ export const createOne = (Model) =>
     res.status(201).json(doc);
   });
 
-export const getOne = (Model, modelName, popOptions) =>
+export const getOne = (Model, modelName) =>
   asyncHandler(async (req, res, next) => {
-    const doc = await Model.findById(req.params.id).populate(popOptions);
+    const doc = await Model.findById(req.params.id);
     if (!doc) {
       return next(new ApiError(`${modelName} not found`, 404));
     }
     res.status(200).json(doc);
   });
-export const getAll = (Model, populate, modelName) =>
+export const getAll = (Model, modelName) =>
   asyncHandler(async (req, res) => {
     const countDocuments = await Model.countDocuments();
-    const apiFeatures = new ApiFeatures(
-      Model.find().populate(populate),
-      req.query,
-    )
+    const apiFeatures = new ApiFeatures(Model.find(), req.query)
       .paginate(countDocuments)
       .sort()
       .limitFields()

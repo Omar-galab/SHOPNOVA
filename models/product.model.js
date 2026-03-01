@@ -83,5 +83,9 @@ const productSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-
+productSchema.pre(/^find/, function () {
+  this.populate({ path: "category", select: "name" })
+    .populate({ path: "subCategory", select: "name" })
+    .populate({ path: "brand", select: "name" });
+});
 export default mongoose.model("Product", productSchema);

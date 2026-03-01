@@ -13,19 +13,12 @@ export const createProduct = createOne(productModel);
 // @desc    Get list of products
 // @route   GET /api/v1/products
 // @access  Public
-export const getProducts = getAll(
-  productModel,
-  { path: "category", select: "name" },
-  "Product",
-);
+export const getProducts = getAll(productModel);
 
 // @desc    Get single product
 // @route   GET /api/v1/products/:id
 // @access  Public
-export const getProduct = getOne(productModel, "Product", {
-  path: "category",
-  select: "name",
-});
+export const getProduct = getOne(productModel, "Product");
 
 // @desc    Update product
 // @route   PUT /api/v1/products/:id
