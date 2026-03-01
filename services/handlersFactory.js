@@ -29,3 +29,30 @@ export const createOne = (Model) =>
     const doc = await Model.create(req.body);
     res.status(201).json(doc);
   });
+
+export const getOne = (Model, modelName, popOptions) =>
+  asyncHandler(async (req, res, next) => {
+    const doc = await Model.findById(req.params.id).populate(popOptions);
+    if (!doc) {
+      return next(new ApiError(`${modelName} not found`, 404));
+    }
+    res.status(200).json(doc);
+  });
+export const getAll = (Model, populate, modelName) =>
+  asyncHandler(async (req, res) => {
+    const countDocuments = await Model.countDocuments();
+    const apiFeatures = new ApiFeatures(
+      Model.find().populate(populate),
+      req.query,
+    )
+      .paginate(countDocuments)
+      .sort()
+      .limitFields()
+      .search(modelName)
+      .filter();
+    const { paginationResult, mongooseQuery } = apiFeatures;
+    const doc = await mongooseQuery;
+    res
+      .status(200)
+      .json({ results: doc.length, page: paginationResult, data: doc });
+  });
