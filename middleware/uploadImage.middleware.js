@@ -2,7 +2,8 @@ import multer from "multer";
 import ApiError from "../utils/apiError.js";
 
 // eslint-disable-next-line import/prefer-default-export
-export const uploadSingleImage = (fieldName) => {
+
+const multerOptions = () => {
   const storage = multer.memoryStorage();
 
   const fileFilter = function (req, file, cb) {
@@ -13,9 +14,10 @@ export const uploadSingleImage = (fieldName) => {
     }
   };
   const upload = multer({ storage: storage, fileFilter: fileFilter });
-
-  return upload.single(fieldName);
+  return upload;
 };
+export const uploadSingleImage = (fieldName) =>
+  multerOptions().single(fieldName);
 
 // const storage = multer.diskStorage({
 //   destination: function (req, file, cb) {
@@ -27,3 +29,6 @@ export const uploadSingleImage = (fieldName) => {
 //     cb(null, fileName);
 //   },
 // });
+
+export const uploadMixOFImages = (arrayOFFields) =>
+  multerOptions().fields(arrayOFFields);

@@ -23,11 +23,13 @@ export const createCategoryValidator = [
 ];
 export const updateCategoryValidator = [
   param("id").isMongoId().withMessage("Invalid category ID"),
-  check("name").optional(),
-  body("name").custom((value, { req }) => {
-    if (value) req.body.slug = slugify(value);
-    return true;
-  }),
+  check("name")
+    .optional()
+    .custom((value, { req }) => {
+      req.body.slug = slugify(value);
+
+      return true;
+    }),
   validatorMiddleware,
 ];
 

@@ -88,4 +88,22 @@ productSchema.pre(/^find/, function () {
     .populate({ path: "subCategory", select: "name" })
     .populate({ path: "brand", select: "name" });
 });
+
+const setImageURL = (doc) => {
+  // set image URL
+  if (doc.imageCover) {
+    doc.imageCover = `${process.env.BASE_URL}/Products/imageCovers/${doc.imageCover}`;
+  }
+  if (doc.images && doc.images.length > 0) {
+    doc.images = doc.images.map(
+      (image) => `${process.env.BASE_URL}/Products/images/${image}`,
+    );
+  }
+};
+productSchema.post("init", (doc) => {
+  setImageURL(doc);
+});
+productSchema.post("save", (doc) => {
+  setImageURL(doc);
+});
 export default mongoose.model("Product", productSchema);
