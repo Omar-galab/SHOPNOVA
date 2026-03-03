@@ -1,6 +1,9 @@
+import path from "path";
+
 import express from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
+
 import dbConnection from "./config/database.js";
 import categoryRoute from "./routes/category.route.js";
 import subCategoryRoute from "./routes/subCategory.route.js";
@@ -18,6 +21,7 @@ const PORT = process.env.PORT || 3000;
 dbConnection();
 
 const app = express();
+app.use(express.static(path.join(path.resolve(), "uploads")));
 app.use(express.json());
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));

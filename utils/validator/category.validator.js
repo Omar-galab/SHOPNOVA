@@ -23,16 +23,9 @@ export const createCategoryValidator = [
 ];
 export const updateCategoryValidator = [
   param("id").isMongoId().withMessage("Invalid category ID"),
-  check("name")
-    .notEmpty()
-    .notEmpty()
-    .withMessage("Category name is required")
-    .isLength({ min: 3 })
-    .withMessage("Category name must be at least 3 characters long")
-    .isLength({ max: 50 })
-    .withMessage("Category name must be less than 50 characters long"),
+  check("name").optional(),
   body("name").custom((value, { req }) => {
-    req.body.slug = slugify(value);
+    if (value) req.body.slug = slugify(value);
     return true;
   }),
   validatorMiddleware,
