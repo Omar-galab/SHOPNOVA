@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import asyncHandler from "express-async-handler";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import jwt from "jsonwebtoken";
@@ -51,7 +52,9 @@ export const Login = asyncHandler(async (req, res, next) => {
     token,
   });
 });
-
+// @desc    Protect routes
+// @route   GET /api/v1/protected
+// @access  Private
 export const protect = asyncHandler(async (req, res, next) => {
   // 1) Get token and check if it's there
   let token;
@@ -95,7 +98,9 @@ export const protect = asyncHandler(async (req, res, next) => {
   req.user = user;
   next();
 });
-
+// @desc    Restrict to specific roles
+// @route   PUT /api/v1/users/:id
+// @access  Private
 export const allowTo = (...roles) =>
   asyncHandler(async (req, res, next) => {
     //access roles is an array of allowed roles for this route
@@ -106,3 +111,20 @@ export const allowTo = (...roles) =>
     }
     next();
   });
+
+export const forgotPassword = asyncHandler(async (req, res, next) => {
+  // 1) Get user based on POSTed email
+  const user = await UserModel.findOne({ email: req.body.email });
+  if (!user) {
+    return next(new ApiError("There is no user with that email address", 404));
+  }
+  const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const resetCodeHash = crypto
+    .createHash("sha256")
+    .update(resetCode)
+    .digest("hex");
+  user.passwordResetCode = resetCodeHash;
+  user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  user.passwordResetVerified = false;
+  await user.save();
+});
