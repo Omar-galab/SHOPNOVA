@@ -14,6 +14,7 @@ import {
   updateSubCategoryValidator,
   deleteSubCategoryValidator,
 } from "../utils/validator/subCategory.validator.js";
+import { protect, allowTo } from "../services/auth.service.js";
 
 // This allows the router to access :categoryId
 // from the parent router (category route)
@@ -23,6 +24,8 @@ router
   .route("/")
   .get(createFilterObject, getSubCategories)
   .post(
+    protect,
+    allowTo("admin"),
     setSubCategoryCategoryId,
     createSubCategoryValidator,
     createSubCategory,
@@ -31,7 +34,12 @@ router
 router
   .route("/:id")
   .get(getSubCategoryValidator, getSubCategory)
-  .put(updateSubCategoryValidator, updateSubCategory)
-  .delete(deleteSubCategoryValidator, deleteSubCategory);
+  .put(protect, allowTo("admin"), updateSubCategoryValidator, updateSubCategory)
+  .delete(
+    protect,
+    allowTo("admin"),
+    deleteSubCategoryValidator,
+    deleteSubCategory,
+  );
 
 export default router;

@@ -8,9 +8,10 @@ import {
   deleteUser,
   uploadUserImage,
   resizeUserImage,
+  updateUserPassword,
 } from "../services/user.service.js";
 import {
-  getUserValidator,
+  changeUserPasswordValidator,
   createUserValidator,
   updateUserValidator,
 } from "../utils/validator/user.validator.js";
@@ -27,5 +28,11 @@ router
   .get(getUser)
   .put(uploadUserImage, updateUserValidator, resizeUserImage, updateUser)
   .delete(deleteUser);
+
+router.put(
+  "/changePassword/:id",
+  changeUserPasswordValidator,
+  updateUserPassword,
+);
 
 export default router;

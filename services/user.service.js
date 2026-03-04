@@ -3,9 +3,11 @@ import fs from "fs";
 import sharp from "sharp";
 // eslint-disable-next-line import/no-unresolved
 import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcryptjs";
 import asyncHandler from "express-async-handler";
 import UserModel from "../models/user.model.js";
 import { uploadSingleImage } from "../middleware/uploadImage.middleware.js";
+import ApiError from "../utils/apiError.js";
 
 import {
   deleteOne,
@@ -21,7 +23,51 @@ export const getUser = getOne(UserModel, "User");
 
 export const createUser = createOne(UserModel);
 
-export const updateUser = updateOne(UserModel, "User");
+export const updateUser = asyncHandler(async (req, res, next) => {
+  const doc = await UserModel.findByIdAndUpdate(
+    req.params.id,
+    {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      profileImage: req.body.profileImage,
+      slug: req.body.slug,
+      role: req.body.role,
+      status: req.body.status,
+    },
+    {
+      new: true,
+    },
+  );
+  if (!doc) {
+    return next(new ApiError(`${req.params.id} not found`, 404));
+  }
+  res.status(200).json(doc);
+});
+
+export const updateUserPassword = asyncHandler(async (req, res, next) => {
+  const user = await UserModel.findByIdAndUpdate(
+    req.params.id,
+    {
+      password: await bcrypt.hash(req.body.password, 12),
+      passwordChangedAt: Date.now(), // 👈 Record when password changed
+    },
+    {
+      new: true,
+    },
+  );
+
+  if (!user) {
+    return next(new ApiError(`User not found with id: ${req.params.id}`, 404));
+  }
+
+  res.status(200).json({
+    // 👈 Send response!
+    status: "success",
+    message: "Password updated successfully",
+    data: user,
+  });
+});
 
 export const deleteUser = deleteOne(UserModel, "User");
 

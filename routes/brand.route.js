@@ -16,18 +16,33 @@ import {
   updateBrandValidator,
   deleteBrandValidator,
 } from "../utils/validator/brand.validator.js";
+import { protect, allowTo } from "../services/auth.service.js";
 
 const router = express.Router();
 
 router
   .route("/")
   .get(getBrands)
-  .post(uploadBrandImage, createBrandValidator, resizeBrandImage, createBrand);
+  .post(
+    uploadBrandImage,
+    protect,
+    allowTo("admin"),
+    createBrandValidator,
+    resizeBrandImage,
+    createBrand,
+  );
 
 router
   .route("/:id")
   .get(getBrandValidator, getBrand)
-  .put(uploadBrandImage, updateBrandValidator, resizeBrandImage, updateBrand)
-  .delete(deleteBrandValidator, deleteBrand);
+  .put(
+    uploadBrandImage,
+    protect,
+    allowTo("admin"),
+    updateBrandValidator,
+    resizeBrandImage,
+    updateBrand,
+  )
+  .delete(protect, allowTo("admin"), deleteBrandValidator, deleteBrand);
 
 export default router;
