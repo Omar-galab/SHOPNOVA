@@ -4,7 +4,7 @@ import sharp from "sharp";
 // eslint-disable-next-line import/no-unresolved
 import { v4 as uuidv4 } from "uuid";
 import asyncHandler from "express-async-handler";
-import brandModel from "../models/brand.model.js";
+import UserModel from "../models/user.model.js";
 import { uploadSingleImage } from "../middleware/uploadImage.middleware.js";
 
 import {
@@ -15,35 +15,35 @@ import {
   getAll,
 } from "./handlersFactory.service.js";
 
-export const getBrands = getAll(brandModel);
+export const getAllUsers = getAll(UserModel);
 
-export const getBrand = getOne(brandModel, "Brand");
+export const getUser = getOne(UserModel, "User");
 
-export const createBrand = createOne(brandModel);
+export const createUser = createOne(UserModel);
 
-export const updateBrand = updateOne(brandModel, "Brand");
+export const updateUser = updateOne(UserModel, "User");
 
-export const deleteBrand = deleteOne(brandModel, "Brand");
+export const deleteUser = deleteOne(UserModel, "User");
 
-export const resizeBrandImage = asyncHandler(async (req, res, next) => {
+export const resizeUserImage = asyncHandler(async (req, res, next) => {
   if (!req.file) return next();
 
   // Auto-create folder if not exists
-  const dir = "uploads/brands";
+  const dir = "uploads/users";
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 
-  const fileName = `brand-${uuidv4()}-${Date.now()}.jpeg`;
+  const fileName = `user-${uuidv4()}-${Date.now()}.jpeg`;
   await sharp(req.file.buffer)
     .resize(600, 600)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
     .toFile(`${dir}/${fileName}`);
 
-  req.body.image = fileName;
+  req.body.profileImage = fileName;
 
   next();
 });
 
-export const uploadBrandImage = uploadSingleImage("image");
+export const uploadUserImage = uploadSingleImage("profileImage");

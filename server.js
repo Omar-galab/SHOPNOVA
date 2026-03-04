@@ -11,6 +11,7 @@ import ApiError from "./utils/apiError.js";
 import globalErrorHandler from "./middleware/error.middleware.js";
 import brandRoute from "./routes/brand.route.js";
 import productRoute from "./routes/product.route.js";
+import userRoute from "./routes/user.route.js";
 
 dotenv.config({
   path: "./config.env",
@@ -34,6 +35,7 @@ app.use("/api/v1/categories", categoryRoute);
 app.use("/api/v1/subcategories", subCategoryRoute);
 app.use("/api/v1/brands", brandRoute);
 app.use("/api/v1/products", productRoute);
+app.use("/api/v1/users", userRoute);
 
 app.use((req, res, next) => {
   //const err = new Error(`Can't find ${req.originalUrl} on this server!`);

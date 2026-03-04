@@ -5,7 +5,7 @@ import {
   createOne,
   getOne,
   getAll,
-} from "./handlersFactory.js";
+} from "./handlersFactory.service.js";
 
 export const setSubCategoryCategoryId = (req, res, next) => {
   if (!req.body.category) req.body.category = req.params.categoryId;

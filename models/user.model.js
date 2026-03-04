@@ -1,5 +1,6 @@
-import e from "express";
 import mongoose from "mongoose";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
@@ -38,10 +39,32 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    active: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
   },
 );
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return;
+  this.password = await bcrypt.hash(this.password, 12);
+});
+const setImageURL = (doc) => {
+  // set image URL
+  if (doc.profileImage) {
+    doc.profileImage = `${process.env.BASE_URL}/users/${doc.profileImage}`;
+  }
+};
 
-export default mongoose.model("User", userSchema);
+userSchema.post("init", (doc) => {
+  setImageURL(doc);
+});
+userSchema.post("save", (doc) => {
+  // set image URL
+  setImageURL(doc);
+});
+
+export default mongoose.model("UserModel", userSchema);
