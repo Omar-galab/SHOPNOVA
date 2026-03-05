@@ -93,3 +93,8 @@ export const resizeUserImage = asyncHandler(async (req, res, next) => {
 });
 
 export const uploadUserImage = uploadSingleImage("profileImage");
+
+export const getLoggedUserData = asyncHandler(async (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+});

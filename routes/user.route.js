@@ -9,7 +9,9 @@ import {
   uploadUserImage,
   resizeUserImage,
   updateUserPassword,
+  getLoggedUserData,
 } from "../services/user.service.js";
+import { protect, allowTo } from "../services/auth.service.js";
 import {
   changeUserPasswordValidator,
   createUserValidator,
@@ -18,6 +20,10 @@ import {
 
 const router = express.Router();
 
+router.use(protect);
+
+router.get("/getMe", getLoggedUserData, getUser);
+router.use(allowTo("admin"));
 router
   .route("/")
   .get(getAllUsers)
