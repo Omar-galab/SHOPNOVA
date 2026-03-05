@@ -11,7 +11,7 @@ import {
   createOne,
   getOne,
   getAll,
-} from "./handlersFactory.js";
+} from "./handlersFactory.service.js";
 import { uploadMixOFImages } from "../middleware/uploadImage.middleware.js";
 
 // eslint-disable-next-line import/prefer-default-export

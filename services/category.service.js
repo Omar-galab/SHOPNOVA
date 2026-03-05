@@ -1,4 +1,3 @@
-
 // eslint-disable-next-line import/no-extraneous-dependencies
 import sharp from "sharp";
 // eslint-disable-next-line import/no-unresolved
@@ -13,10 +12,7 @@ import {
   createOne,
   getOne,
   getAll,
-} from "./handlersFactory.js";
-
-
-
+} from "./handlersFactory.service.js";
 
 export const resizeCategoryImage = asyncHandler(async (req, res, next) => {
   const fileName = `category-${uuidv4()}-${Date.now()}.jpeg`;

@@ -13,7 +13,7 @@ import {
   createOne,
   getOne,
   getAll,
-} from "./handlersFactory.js";
+} from "./handlersFactory.service.js";
 
 export const getBrands = getAll(brandModel);
 

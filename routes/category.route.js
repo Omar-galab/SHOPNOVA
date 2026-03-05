@@ -9,6 +9,7 @@ import {
   uploadCategoryImage,
   resizeCategoryImage,
 } from "../services/category.service.js";
+import { protect, allowTo } from "../services/auth.service.js";
 import {
   getCategoryValidator,
   createCategoryValidator,
@@ -30,6 +31,8 @@ router
   .get(getCategories)
   .post(
     uploadCategoryImage,
+    protect,
+    allowTo("admin"),
     createCategoryValidator,
     resizeCategoryImage,
     createCategory,
@@ -40,10 +43,12 @@ router
   .get(getCategoryValidator, getCategory)
   .put(
     uploadCategoryImage,
+    protect,
+    allowTo("admin"),
     updateCategoryValidator,
     resizeCategoryImage,
     updateCategory,
   )
-  .delete(deleteCategoryValidator, deleteCategory);
+  .delete(protect, allowTo("admin"), deleteCategoryValidator, deleteCategory);
 
 export default router;
