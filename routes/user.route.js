@@ -10,6 +10,9 @@ import {
   resizeUserImage,
   updateUserPassword,
   getLoggedUserData,
+  updateLoggedUserPassword,
+  updateLoggedUserData,
+  deleteLoggedUserData,
 } from "../services/user.service.js";
 import { protect, allowTo } from "../services/auth.service.js";
 import {
@@ -17,12 +20,23 @@ import {
   createUserValidator,
   updateUserValidator,
 } from "../utils/validator/user.validator.js";
+import { deleteBrandValidator } from "../utils/validator/brand.validator.js";
 
 const router = express.Router();
 
 router.use(protect);
 
 router.get("/getMe", getLoggedUserData, getUser);
+router.put("/updatePassword", updateLoggedUserPassword);
+router.put(
+  "/updateMe",
+  uploadUserImage,
+  resizeUserImage,
+  updateLoggedUserData,
+  updateLoggedUserData,
+  updateUser,
+);
+router.delete("/deleteMe", deleteLoggedUserData);
 router.use(allowTo("admin"));
 router
   .route("/")

@@ -6,19 +6,11 @@ import jwt from "jsonwebtoken";
 import ApiError from "../utils/apiError.js";
 import UserModel from "../models/user.model.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import createToken from "../utils/createToken.js";
 
 // eslint-disable-next-line import/prefer-default-export
 
-const createToken = (payload) =>
-  jwt.sign(
-    {
-      userId: payload,
-    },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    },
-  );
+
 
 // @desc    Signup a new user
 // @route   POST /api/v1/auth/signup
