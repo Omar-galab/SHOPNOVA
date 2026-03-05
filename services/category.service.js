@@ -1,56 +1,39 @@
-import slugify from "slugify";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import sharp from "sharp";
+// eslint-disable-next-line import/no-unresolved
+import { v4 as uuidv4 } from "uuid";
 import asyncHandler from "express-async-handler";
 import categoryModel from "../models/category.model.js";
-import ApiError from "../utils/apiError.js";
+import { uploadSingleImage } from "../middleware/uploadImage.middleware.js";
 
-export const getCategories = asyncHandler(async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 5;
-  const skip = (page - 1) * limit;
+import {
+  deleteOne,
+  updateOne,
+  createOne,
+  getOne,
+  getAll,
+} from "./handlersFactory.service.js";
 
-  const categories = await categoryModel.find({}).skip(skip).limit(limit);
-  res
-    .status(200)
-    .json({ results: categories.length, page, skip, data: categories });
+export const resizeCategoryImage = asyncHandler(async (req, res, next) => {
+  const fileName = `category-${uuidv4()}-${Date.now()}.jpeg`;
+  await sharp(req.file.buffer)
+    .resize(600, 600)
+    .toFormat("jpeg")
+    .jpeg({ quality: 90 })
+    .toFile(`uploads/categories/${fileName}`);
+
+  req.body.image = fileName;
+
+  next();
 });
+export const getCategories = getAll(categoryModel);
 
-export const getCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const category = await categoryModel.findById(id);
-  if (!category) {
-    return next(new ApiError("Category not found", 404));
-  }
-  res.status(200).json(category);
-});
+export const getCategory = getOne(categoryModel, "Category");
 
-export const createCategory = asyncHandler(async (req, res) => {
-  const { name } = req.body;
-  const category = await categoryModel.create({
-    name,
-    slug: slugify(name),
-  });
-  res.status(201).json(category);
-});
+export const createCategory = createOne(categoryModel);
 
-export const updateCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  const category = await categoryModel.findByIdAndUpdate(
-    id,
-    { name, slug: slugify(name) },
-    { new: true },
-  );
-  if (!category) {
-    return next(new ApiError("category not found", 404));
-  }
-  res.status(200).json(category);
-});
+export const updateCategory = updateOne(categoryModel, "Category");
 
-export const deleteCategory = asyncHandler(async (req, res, next) => {
-  const { id } = req.params;
-  const category = await categoryModel.findByIdAndDelete(id);
-  if (!category) {
-    return next(new ApiError("category not found", 404));
-  }
-  res.status(204).json(category);
-});
+export const deleteCategory = deleteOne(categoryModel, "Category");
+
+export const uploadCategoryImage = uploadSingleImage("image");

@@ -1,11 +1,18 @@
+import path from "path";
+
 import express from "express";
 import dotenv from "dotenv";
 import morgan from "morgan";
+
 import dbConnection from "./config/database.js";
 import categoryRoute from "./routes/category.route.js";
 import subCategoryRoute from "./routes/subCategory.route.js";
 import ApiError from "./utils/apiError.js";
 import globalErrorHandler from "./middleware/error.middleware.js";
+import brandRoute from "./routes/brand.route.js";
+import productRoute from "./routes/product.route.js";
+import userRoute from "./routes/user.route.js";
+import authRoute from "./routes/auth.route.js";
 
 dotenv.config({
   path: "./config.env",
@@ -16,6 +23,7 @@ const PORT = process.env.PORT || 3000;
 dbConnection();
 
 const app = express();
+app.use(express.static(path.join(path.resolve(), "uploads")));
 app.use(express.json());
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
@@ -23,9 +31,13 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Routes
-
+app.set("query parser", "extended");
 app.use("/api/v1/categories", categoryRoute);
 app.use("/api/v1/subcategories", subCategoryRoute);
+app.use("/api/v1/brands", brandRoute);
+app.use("/api/v1/products", productRoute);
+app.use("/api/v1/users", userRoute);
+app.use("/api/v1/auth", authRoute);
 
 app.use((req, res, next) => {
   //const err = new Error(`Can't find ${req.originalUrl} on this server!`);
