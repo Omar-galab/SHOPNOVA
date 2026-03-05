@@ -30,9 +30,13 @@ export const createOne = (Model) =>
     res.status(201).json(doc);
   });
 
-export const getOne = (Model, modelName) =>
+export const getOne = (Model, modelName , populateOptions) =>
   asyncHandler(async (req, res, next) => {
-    const doc = await Model.findById(req.params.id);
+    let query = Model.findById(req.params.id);
+    if (populateOptions) {
+      query = query.populate(populateOptions);
+    }
+    const doc = await query;
     if (!doc) {
       return next(new ApiError(`${modelName} not found`, 404));
     }

@@ -81,12 +81,27 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
 );
+productSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "product",
+  localField: "_id",
+});
 productSchema.pre(/^find/, function () {
   this.populate({ path: "category", select: "name" })
     .populate({ path: "subCategory", select: "name" })
     .populate({ path: "brand", select: "name" });
+});
+
+// ✅ Only populate reviews on findOne (single product)
+// not on find (list of products) for performance
+productSchema.pre("findOne", function () {
+  this.populate({ path: "reviews", select: "title text rating user" });
 });
 
 const setImageURL = (doc) => {
@@ -106,4 +121,5 @@ productSchema.post("init", (doc) => {
 productSchema.post("save", (doc) => {
   setImageURL(doc);
 });
+
 export default mongoose.model("Product", productSchema);

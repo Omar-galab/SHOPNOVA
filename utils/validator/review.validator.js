@@ -34,20 +34,35 @@ export const createReviewValidator = [
   validatorMiddleware,
 ];
 export const updateReviewValidator = [
- check("id").isMongoId().withMessage("Invalid review ID").custom(async (value, { req }) => {
-    const review = await reviewsModel.findById(value);
-    if (!review) {
-      throw new Error("Review not found");
-    }
-    if (review.user.toString() !== req.user._id.toString()) {
-      throw new Error("You can only update your own reviews");
-    } 
- }),
+  check("id")
+    .isMongoId()
+    .withMessage("Invalid review ID")
+    .custom(async (value, { req }) => {
+      const review = await reviewsModel.findById(value);
+      if (!review) {
+        throw new Error("Review not found");
+      }
+      if (review.user.toString() !== req.user._id.toString()) {
+        throw new Error("You can only update your own reviews");
+      }
+    }),
 
   validatorMiddleware,
 ];
 
 export const deleteBrandValidator = [
-  param("id").isMongoId().withMessage("Invalid brand ID"),
+  param("id").isMongoId().withMessage("Invalid brand ID").custom(async (value, { req }) => {
+    if (req.user.role === "admin") {
+      return true; // Admin can delete any review
+    }
+      const review = await reviewsModel.findById(value);
+      if (!review) {
+        throw new Error("Review not found");
+      }
+      
+      if (review.user.toString() !== req.user._id.toString()) {
+        throw new Error("You can only update your own reviews");
+      }
+    }),
   validatorMiddleware,
 ];
