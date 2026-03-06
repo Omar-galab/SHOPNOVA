@@ -30,13 +30,9 @@ export const createOne = (Model) =>
     res.status(201).json(doc);
   });
 
-export const getOne = (Model, modelName , populateOptions) =>
+export const getOne = (Model, modelName) =>
   asyncHandler(async (req, res, next) => {
-    let query = Model.findById(req.params.id);
-    if (populateOptions) {
-      query = query.populate(populateOptions);
-    }
-    const doc = await query;
+    const doc = await Model.findById(req.params.id);
     if (!doc) {
       return next(new ApiError(`${modelName} not found`, 404));
     }
@@ -44,8 +40,12 @@ export const getOne = (Model, modelName , populateOptions) =>
   });
 export const getAll = (Model, modelName) =>
   asyncHandler(async (req, res) => {
-    const countDocuments = await Model.countDocuments();
-    const apiFeatures = new ApiFeatures(Model.find(), req.query)
+    let filter = {};
+    if (req.filterObject) {
+      filter = req.filterObject;
+    }
+    const countDocuments = await Model.countDocuments(filter);
+    const apiFeatures = new ApiFeatures(Model.find(filter), req.query)
       .paginate(countDocuments)
       .sort()
       .limitFields()

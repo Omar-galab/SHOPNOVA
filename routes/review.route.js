@@ -6,21 +6,27 @@ import {
   createReview,
   updateReview,
   deleteReview,
+  createFilterObject,
+  setReviewUserIdAndProductId,
 } from "../services/review.service.js";
 import {
   createReviewValidator,
   updateReviewValidator,
   getReviewValidator,
-  deleteBrandValidator,
+  deleteReviewValidator,
 } from "../utils/validator/review.validator.js";
 import { protect, allowTo } from "../services/auth.service.js";
 
-const router = express.Router();
+
+
+
+
+const router = express.Router({ mergeParams: true });
 
 router
   .route("/")
-  .get(getReviews)
-  .post(protect, allowTo("user"), createReviewValidator, createReview);
+  .get(createFilterObject, getReviews)
+  .post(protect, allowTo("user"),setReviewUserIdAndProductId, createReviewValidator, createReview);
 
 router
   .route("/:id")
@@ -29,7 +35,7 @@ router
   .delete(
     protect,
     allowTo("user", "admin"),
-    deleteBrandValidator,
+    deleteReviewValidator,
     deleteReview,
   );
 

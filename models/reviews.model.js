@@ -38,4 +38,40 @@ reviewSchema.pre(/^find/, async function () {
   this.populate({ path: "user", select: "name profileImage" });
 });
 
+
+reviewSchema.statics.calcAverageRating = async function (productId){
+  const result = await this.aggregate([
+    {$match: {product: productId}},
+    {$group: {_id: "$product", avgRating: {$avg: "$rating"}, ratingCount: {$sum: 1}}}
+  ])
+  if(result.length > 0){
+    await this.model("Product").findByIdAndUpdate(productId, {
+      averageRating: result[0].avgRating,
+      ratingsQuantity: result[0].ratingCount,
+    }
+  );
+  }else{
+    await this.model("Product").findByIdAndUpdate(productId, {
+      averageRating: 0,
+      ratingsQuantity: 0,
+    });
+  }
+}
+
+reviewSchema.post("save", async function () {
+  await this.constructor.calcAverageRating(this.product);
+});
+
+reviewSchema.post("findOneAndUpdate", async function (doc) {
+  if (doc) {
+    await doc.constructor.calcAverageRating(doc.product);
+  }
+});
+
+reviewSchema.post("findOneAndDelete", async function (doc) {
+  if (doc) {
+    await doc.constructor.calcAverageRating(doc.product);
+  }
+});
+
 export default mongoose.model("Review", reviewSchema);

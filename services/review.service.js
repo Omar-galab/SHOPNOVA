@@ -33,3 +33,25 @@ export const updateReview = updateOne(reviewsModel, "Review");
 // @route   DELETE /api/v1/reviews/:id
 // @access  Private
 export const deleteReview = deleteOne(reviewsModel, "Review");
+
+
+// @desc    Create filter object for review
+// @route   GET /api/v1/reviews
+// @access  Public
+// nestedRoute
+export const createFilterObject = (req, res, next) => {
+  let filterObject = {};
+  if (req.params.productId) filterObject = { product: req.params.productId };
+  req.filterObject = filterObject;
+  next();
+};
+
+
+// @desc    Set user ID in body
+// @route   POST /api/v1/reviews
+// @access  Private
+export const setReviewUserIdAndProductId = (req, res, next) => {
+  if (!req.body.user) req.body.user = req.user._id;
+  if (!req.body.product) req.body.product = req.params.productId;
+  next();
+};

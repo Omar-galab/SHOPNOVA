@@ -42,16 +42,17 @@ export const updateReviewValidator = [
       if (!review) {
         throw new Error("Review not found");
       }
-      if (review.user.toString() !== req.user._id.toString()) {
+      if (review.user._id.toString() !== req.user._id.toString()) {
         throw new Error("You can only update your own reviews");
       }
+      return true;
     }),
 
   validatorMiddleware,
 ];
 
-export const deleteBrandValidator = [
-  param("id").isMongoId().withMessage("Invalid brand ID").custom(async (value, { req }) => {
+export const deleteReviewValidator = [
+  param("id").isMongoId().withMessage("Invalid review ID").custom(async (value, { req }) => {
     if (req.user.role === "admin") {
       return true; // Admin can delete any review
     }
@@ -60,9 +61,10 @@ export const deleteBrandValidator = [
         throw new Error("Review not found");
       }
       
-      if (review.user.toString() !== req.user._id.toString()) {
-        throw new Error("You can only update your own reviews");
+      if (review.user._id.toString() !== req.user._id.toString()) {
+        throw new Error("You can only delete your own reviews");
       }
+      return true;
     }),
   validatorMiddleware,
 ];
