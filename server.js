@@ -14,6 +14,7 @@ import productRoute from "./routes/product.route.js";
 import userRoute from "./routes/user.route.js";
 import authRoute from "./routes/auth.route.js";
 import reviewRoute from "./routes/review.route.js";
+import wishlistRoute from "./routes/wishList.route.js";
 
 dotenv.config({
   path: "./config.env",
@@ -40,6 +41,7 @@ app.use("/api/v1/products", productRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/reviews", reviewRoute);
+app.use("/api/v1/wishlist", wishlistRoute);
 
 app.use((req, res, next) => {
   //const err = new Error(`Can't find ${req.originalUrl} on this server!`);
