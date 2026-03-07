@@ -53,7 +53,31 @@ const userSchema = new mongoose.Schema(
         ref: "Product",
       },
     ],
+
+     addresses: [
+    {
+      id: mongoose.Schema.Types.ObjectId,
+      alias: {
+        type: String,
+        required: [true, "Address alias is required"],
+        enum: ["Home", "Work", "Other"], 
+      },
+      street: {
+        type: String,
+        required: [true, "Street is required"],
+      },
+      city: {
+        type: String,
+        required: [true, "City is required"],
+      },
+      state: String,
+      zip: String,
+      country: String,
+      phone: String,
+    },
+  ],
   },
+  
   {
     timestamps: true,
   },
