@@ -10,8 +10,6 @@ import createToken from "../utils/createToken.js";
 
 // eslint-disable-next-line import/prefer-default-export
 
-
-
 // @desc    Signup a new user
 // @route   POST /api/v1/auth/signup
 // @access  Public
