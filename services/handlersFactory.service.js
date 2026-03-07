@@ -40,8 +40,12 @@ export const getOne = (Model, modelName) =>
   });
 export const getAll = (Model, modelName) =>
   asyncHandler(async (req, res) => {
-    const countDocuments = await Model.countDocuments();
-    const apiFeatures = new ApiFeatures(Model.find(), req.query)
+    let filter = {};
+    if (req.filterObject) {
+      filter = req.filterObject;
+    }
+    const countDocuments = await Model.countDocuments(filter);
+    const apiFeatures = new ApiFeatures(Model.find(filter), req.query)
       .paginate(countDocuments)
       .sort()
       .limitFields()

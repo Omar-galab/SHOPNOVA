@@ -15,9 +15,9 @@ import {
   deleteProductValidator,
 } from "../utils/validator/product.validator.js";
 import { protect, allowTo } from "../services/auth.service.js";
-
+import reviewRouter from "./review.route.js";
 const router = express.Router();
-
+router.use("/:productId/reviews", reviewRouter);
 router
   .route("/")
   .get(getProducts)
