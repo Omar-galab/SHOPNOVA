@@ -10,11 +10,13 @@ import { getAll, getOne } from "./handlersFactory.service.js";
 export const createCartOrder = asyncHandler(async (req, res, next) => {
   // Get the user's cart
   const cart = await Cart.findById(req.params.cartId);
+  if (!cart) return next(new ApiError("Cart not found", 404));
+
   //get order price depending on the cart items and the quantity of each item with the tax and shipping price
-  const cartPrice = cart.totalPriceAfterDiscount
-    ? cart.totalPriceAfterDiscount
+  const cartPrice = cart.totalCartPriceAfterDiscount
+    ? cart.totalCartPriceAfterDiscount
     : cart.totalCartPrice;
-  const totalPrice = cartPrice + cart.taxPrice + cart.shippingPrice;
+  const totalPrice = cartPrice + (cart.taxPrice || 0) + (cart.shippingPrice || 0);
 
   //get the shipping address from the user profile
   // 3) Get shipping address from user addresses
