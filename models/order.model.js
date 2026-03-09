@@ -44,6 +44,15 @@ const orderSchema = new mongoose.Schema({
       deliveredAt: {
         type: Date,
       },
+      shippingAddress: {
+        alias: String,
+        street: String,
+        city: String,
+        state: String,
+        zip: String,
+        country: String,
+        phone: String,
+      },
     },
   ],
 });
