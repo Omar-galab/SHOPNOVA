@@ -1,13 +1,15 @@
 import path from "path";
-
 import express from "express";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import cors from "cors";
+import compression from "compression";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import dbConnection from "./config/database.js";
 import mountRoutes from "./routes/index.js";
 import ApiError from "./utils/apiError.js";
 import globalErrorHandler from "./middleware/error.middleware.js";
-
+import { webhookCheckout } from "./services/payment.service.js";
 
 dotenv.config({
   path: "./config.env",
@@ -18,14 +20,25 @@ const PORT = process.env.PORT || 3000;
 dbConnection();
 
 const app = express();
+app.use(cors());
+
+app.use(compression());
 app.use(express.static(path.join(path.resolve(), "uploads")));
+
+// Stripe webhook MUST use raw body BEFORE express.json()
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  webhookCheckout,
+);
+
 app.use(express.json());
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
   console.log("Morgan enabled");
 }
-  //routs
-  mountRoutes(app);
+//routs
+mountRoutes(app);
 
 app.use((req, res, next) => {
   //const err = new Error(`Can't find ${req.originalUrl} on this server!`);
