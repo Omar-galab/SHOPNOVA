@@ -46,13 +46,13 @@ reviewSchema.statics.calcAverageRating = async function (productId){
   ])
   if(result.length > 0){
     await this.model("Product").findByIdAndUpdate(productId, {
-      averageRating: result[0].avgRating,
+      ratingsAverage: result[0].avgRating,
       ratingsQuantity: result[0].ratingCount,
     }
   );
   }else{
     await this.model("Product").findByIdAndUpdate(productId, {
-      averageRating: 0,
+      ratingsAverage: 0,
       ratingsQuantity: 0,
     });
   }

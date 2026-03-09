@@ -1,21 +1,15 @@
 import path from "path";
-
 import express from "express";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import cors from "cors";
+import compression from "compression";
 import dotenv from "dotenv";
 import morgan from "morgan";
-
 import dbConnection from "./config/database.js";
-import categoryRoute from "./routes/category.route.js";
-import subCategoryRoute from "./routes/subCategory.route.js";
+import mountRoutes from "./routes/index.js";
 import ApiError from "./utils/apiError.js";
 import globalErrorHandler from "./middleware/error.middleware.js";
-import brandRoute from "./routes/brand.route.js";
-import productRoute from "./routes/product.route.js";
-import userRoute from "./routes/user.route.js";
-import authRoute from "./routes/auth.route.js";
-import reviewRoute from "./routes/review.route.js";
-import wishlistRoute from "./routes/wishList.route.js";
-import addressesRoute from "./routes/adresses.route.js";
+import { webhookCheckout } from "./services/payment.service.js";
 
 dotenv.config({
   path: "./config.env",
@@ -26,24 +20,25 @@ const PORT = process.env.PORT || 3000;
 dbConnection();
 
 const app = express();
+app.use(cors());
+
+app.use(compression());
 app.use(express.static(path.join(path.resolve(), "uploads")));
+
+// Stripe webhook MUST use raw body BEFORE express.json()
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  webhookCheckout,
+);
+
 app.use(express.json());
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
   console.log("Morgan enabled");
 }
-
-// Routes
-app.set("query parser", "extended");
-app.use("/api/v1/categories", categoryRoute);
-app.use("/api/v1/subcategories", subCategoryRoute);
-app.use("/api/v1/brands", brandRoute);
-app.use("/api/v1/products", productRoute);
-app.use("/api/v1/users", userRoute);
-app.use("/api/v1/auth", authRoute);
-app.use("/api/v1/reviews", reviewRoute);
-app.use("/api/v1/wishlist", wishlistRoute);
-app.use("/api/v1/address", addressesRoute);
+//routs
+mountRoutes(app);
 
 app.use((req, res, next) => {
   //const err = new Error(`Can't find ${req.originalUrl} on this server!`);
