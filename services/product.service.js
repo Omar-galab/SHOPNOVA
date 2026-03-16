@@ -12,7 +12,7 @@ import {
   getOne,
   getAll,
 } from "./handlersFactory.service.js";
-import { uploadMixOFImages } from "../middleware/uploadImage.middleware.js";
+import { uploadMixOFImages , handleUpload } from "../middleware/uploadImage.middleware.js";
 
 // eslint-disable-next-line import/prefer-default-export
 
@@ -22,49 +22,35 @@ export const uploadProductImage = uploadMixOFImages([
 ]);
 
 export const resizeProductImage = asyncHandler(async (req, res, next) => {
-  if (!req.files.imageCover) return next();
-  // Auto-create folder if not exists
-  const dirCover = "uploads/products/imageCovers";
-  if (!fs.existsSync(dirCover)) {
-    fs.mkdirSync(dirCover, { recursive: true });
-  }
-  // 1) Process imageCover
-  const imageCoverFileName = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
-  await sharp(req.files.imageCover[0].buffer)
-    .resize(2000, 1333)
-    .toFormat("jpeg")
-    .jpeg({ quality: 90 })
-    .toFile(`${dirCover}/${imageCoverFileName}`);
+  if (!req.files) return next();
 
-  req.body.imageCover = imageCoverFileName;
-
-  // 2) Process images
-  if (req.files.images) {
-    req.body.images = [];
-    const dir = "uploads/products/images";
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    await Promise.all(
-      //^^^^^^^^^^^ ✅ Use global Promise.all with await
-      req.files.images.map(async (img, index) => {
-        //              ^^^^^ ✅ Just async, no asyncHandler
-        const imageFileName = `product-${uuidv4()}-${Date.now()}-${index}.jpeg`;
-
-        await sharp(img.buffer)
-          .resize(2000, 1333)
-          .toFormat("jpeg")
-          .jpeg({ quality: 90 })
-          .toFile(`${dir}/${imageFileName}`);
-
-        req.body.images.push(imageFileName);
-      }),
+  // 1)  Upload imageCover to Cloudinary
+  if (req.files.imageCover) {
+    req.body.imageCover = await handleUpload(
+      req.files.imageCover[0], // ← file object
+      "products/covers",       // ← folder in Cloudinary
+      2000,                    // ← width
+      1333,                    // ← height
     );
-    console.log(req.body.imageCover);
-    console.log(req.body.images);
-    next();
   }
+
+  // 2) ✅ Upload images array to Cloudinary
+  if (req.files.images) {
+    req.body.images = await Promise.all(
+      req.files.images.map((img) =>
+        handleUpload(
+          img,              // ← file object
+          "products/images", // ← folder in Cloudinary
+          800,              // ← width
+          800,              // ← height
+        )
+      )
+    );
+  }
+
+  next();
 });
+
 
 export const createProduct = createOne(productModel);
 

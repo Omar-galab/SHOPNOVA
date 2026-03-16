@@ -1,17 +1,12 @@
+/* eslint-disable import/first */
+import "./config/env.js";
 import path from "path";
-
 import express from "express";
-import dotenv from "dotenv";
 import morgan from "morgan";
 import dbConnection from "./config/database.js";
 import mountRoutes from "./routes/index.js";
 import ApiError from "./utils/apiError.js";
 import globalErrorHandler from "./middleware/error.middleware.js";
-
-
-dotenv.config({
-  path: "./config.env",
-});
 
 const PORT = process.env.PORT || 3000;
 // Import database connection
@@ -24,8 +19,8 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
   console.log("Morgan enabled");
 }
-  //routs
-  mountRoutes(app);
+//routs
+mountRoutes(app);
 
 app.use((req, res, next) => {
   //const err = new Error(`Can't find ${req.originalUrl} on this server!`);
