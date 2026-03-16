@@ -135,8 +135,23 @@ export const updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
 });
 
 export const updateLoggedUserData = asyncHandler(async (req, res, next) => {
-  req.params.id = req.user._id;
-  next();
+  const updatedUser = await UserModel.findByIdAndUpdate(
+    req.user._id,
+    {
+      name: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: updatedUser,
+  });
 });
 // @desc    Delete logged user account
 // @route   DELETE /api/v1/users/deleteMe

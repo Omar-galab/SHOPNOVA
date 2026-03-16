@@ -36,7 +36,7 @@ export const getAddresses = asyncHandler(async (req, res, next) => {
   });
 });
 
-export const removeAdress = asyncHandler(async (req, res) => {
+export const removeAdress = asyncHandler(async (req, res, next) => {
 
     const user = await UserModel.findByIdAndUpdate(
         req.user._id,
