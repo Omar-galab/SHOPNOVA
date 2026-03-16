@@ -93,9 +93,9 @@ productSchema.virtual("reviews", {
   localField: "_id",
 });
 productSchema.pre(/^find/, function () {
-  this.populate({ path: "category", select: "name" })
-    .populate({ path: "subCategory", select: "name" })
-    .populate({ path: "brand", select: "name" });
+  this.populate({ path: "Category", select: "name" })
+    .populate({ path: "SubCategory", select: "name" })
+    .populate({ path: "Brand", select: "name" });
 });
 
 // ✅ Only populate reviews on findOne (single product)
@@ -104,22 +104,22 @@ productSchema.pre("findOne", function () {
   this.populate({ path: "reviews", select: "title text rating user" });
 });
 
-const setImageURL = (doc) => {
-  // set image URL
-  if (doc.imageCover) {
-    doc.imageCover = `${process.env.BASE_URL}/Products/imageCovers/${doc.imageCover}`;
-  }
-  if (doc.images && doc.images.length > 0) {
-    doc.images = doc.images.map(
-      (image) => `${process.env.BASE_URL}/Products/images/${image}`,
-    );
-  }
-};
-productSchema.post("init", (doc) => {
-  setImageURL(doc);
-});
-productSchema.post("save", (doc) => {
-  setImageURL(doc);
-});
+// const setImageURL = (doc) => {
+//   // set image URL
+//   if (doc.imageCover) {
+//     doc.imageCover = `${process.env.BASE_URL}/Products/imageCovers/${doc.imageCover}`;
+//   }
+//   if (doc.images && doc.images.length > 0) {
+//     doc.images = doc.images.map(
+//       (image) => `${process.env.BASE_URL}/Products/images/${image}`,
+//     );
+//   }
+// };
+// productSchema.post("init", (doc) => {
+//   setImageURL(doc);
+// });
+// productSchema.post("save", (doc) => {
+//   setImageURL(doc);
+// });
 
 export default mongoose.model("Product", productSchema);

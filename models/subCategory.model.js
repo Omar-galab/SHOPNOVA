@@ -16,7 +16,7 @@ const subCategorySchema = new mongoose.Schema(
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "category",
+      ref: "Category",
       required: [true, "subCategory must belong to a category"],
     },
   },
@@ -24,7 +24,7 @@ const subCategorySchema = new mongoose.Schema(
 );
 
 subCategorySchema.pre(/^find/, function () {
-  this.populate({ path: "category", select: "name" });
+  this.populate({ path: "Category", select: "name" });
 });
 const SubCategory = mongoose.model("SubCategory", subCategorySchema);
 export default SubCategory;

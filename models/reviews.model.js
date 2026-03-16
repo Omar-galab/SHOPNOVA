@@ -1,3 +1,4 @@
+/* eslint-disable prefer-arrow-callback */
 import mongoose from "mongoose";
 
 const reviewSchema = new mongoose.Schema(

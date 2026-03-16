@@ -1,10 +1,10 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import sharp from "sharp";
-// eslint-disable-next-line import/no-unresolved
-import { v4 as uuidv4 } from "uuid";
 import asyncHandler from "express-async-handler";
 import categoryModel from "../models/category.model.js";
-import { uploadSingleImage } from "../middleware/uploadImage.middleware.js";
+import {
+  uploadSingleImage,
+  handleUpload,
+} from "../middleware/uploadImage.middleware.js";
 
 import {
   deleteOne,
@@ -14,15 +14,17 @@ import {
   getAll,
 } from "./handlersFactory.service.js";
 
+//  Resize and upload to Cloudinary
 export const resizeCategoryImage = asyncHandler(async (req, res, next) => {
-  const fileName = `category-${uuidv4()}-${Date.now()}.jpeg`;
-  await sharp(req.file.buffer)
-    .resize(600, 600)
-    .toFormat("jpeg")
-    .jpeg({ quality: 90 })
-    .toFile(`uploads/categories/${fileName}`);
+  if (!req.file) return next();
 
-  req.body.image = fileName;
+  //  Upload to Cloudinary with 600x600 size
+  req.body.image = await handleUpload(
+    req.file,
+    "categories", // ← folder in Cloudinary
+    600, // ← width
+    600, // ← height
+  );
 
   next();
 });

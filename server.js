@@ -1,19 +1,17 @@
+/* eslint-disable import/first */
+import "./config/env.js";
 import path from "path";
 import express from "express";
+import morgan from "morgan";
 // eslint-disable-next-line import/no-extraneous-dependencies
 import cors from "cors";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import compression from "compression";
-import dotenv from "dotenv";
-import morgan from "morgan";
 import dbConnection from "./config/database.js";
 import mountRoutes from "./routes/index.js";
 import ApiError from "./utils/apiError.js";
 import globalErrorHandler from "./middleware/error.middleware.js";
 import { webhookCheckout } from "./services/payment.service.js";
-
-dotenv.config({
-  path: "./config.env",
-});
 
 const PORT = process.env.PORT || 3000;
 // Import database connection
